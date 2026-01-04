@@ -26,5 +26,5 @@
 
 ## ▶ Запуск
 ```bash
-javac src/space/Main.java
-java space.Main
+javac -d out src/space/Main.java src/space/model/*.java
+java -cp out space.Main
