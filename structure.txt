@@ -1,0 +1,10 @@
+satellite-constellation-system/
+├── README.md
+└── src/
+    └── space/
+        ├── Main.java
+        └── model/
+            ├── Satellite.java
+            ├── ImagingSatellite.java
+            ├── CommunicationSatellite.java
+            └── SatelliteConstellation.java
