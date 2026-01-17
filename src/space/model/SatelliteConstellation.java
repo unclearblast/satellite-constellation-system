@@ -15,8 +15,7 @@ public class SatelliteConstellation {
 
     public void addSatellite(Satellite satellite) {
         satellites.add(satellite);
-        System.out.println(satellite.getName()
-                + " добавлен в группировку '" + constellationName + "'");
+        System.out.println(satellite.getName() + " добавлен в группировку '" + constellationName + "'");
     }
 
     public void executeAllMissions() {
@@ -29,3 +28,4 @@ public class SatelliteConstellation {
         return Collections.unmodifiableList(satellites);
     }
 }
+

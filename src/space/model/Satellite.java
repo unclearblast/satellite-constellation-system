@@ -3,35 +3,25 @@ package space.model;
 public abstract class Satellite {
 
     protected final String name;
-    protected boolean isActive;
-    protected double batteryLevel;
+    protected final EnergySystem energy;
+    protected final SatelliteState state;
 
-    protected static final double MIN_BATTERY_TO_ACTIVATE = 0.2;
-
-    protected Satellite(String name, double batteryLevel) {
+    protected Satellite(String name, double initialBattery) {
         this.name = name;
-        this.batteryLevel = batteryLevel;
-        this.isActive = false;
+        this.energy = new EnergySystem(initialBattery);
+        this.state = new SatelliteState();
     }
 
     public boolean activate() {
-        if (batteryLevel > MIN_BATTERY_TO_ACTIVATE) {
-            isActive = true;
+        if (energy.canActivate()) {
+            state.activate();
             return true;
         }
         return false;
     }
 
     public void deactivate() {
-        isActive = false;
-    }
-
-    protected void consumeBattery(double amount) {
-        batteryLevel -= amount;
-        if (batteryLevel <= MIN_BATTERY_TO_ACTIVATE) {
-            batteryLevel = Math.max(batteryLevel, 0);
-            deactivate();
-        }
+        state.deactivate();
     }
 
     protected abstract void performMission();
@@ -40,14 +30,15 @@ public abstract class Satellite {
         return name;
     }
 
-    public double getBatteryLevel() {
-        return batteryLevel;
+    public boolean isActive() {
+        return state.isActive();
     }
 
-    public boolean isActive() {
-        return isActive;
+    public double getBatteryLevel() {
+        return energy.getBatteryLevel();
     }
 
     @Override
     public abstract String toString();
 }
+
