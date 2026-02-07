@@ -1,68 +1,83 @@
-# 🛰 Satellite Constellation Management System
+# Satellite System — система управления спутниковыми группировками
 
-## 📌 Описание проекта
-Данный проект представляет собой консольную систему управления спутниковыми группировками,
-реализованную на языке **Java** с использованием **Spring Boot** и принципов
-**объектно-ориентированного проектирования (ООП)** и **SOLID**.
-
-Проект был выполнен в рамках **3 семинаров**, каждый из которых последовательно улучшал архитектуру системы.
+Учебный проект на Java + Spring Boot, разработанный в рамках семинаров 1–4.  
+Цель проекта — продемонстрировать чистую архитектуру, принципы SOLID и базовые подходы к тестированию
+(unit / mock / integration tests).
 
 ---
 
-## 🎯 Цели проекта
-- Продемонстрировать практическое применение принципов SOLID
-- Реализовать Dependency Inversion Principle (DIP) с помощью Spring Boot
-- Построить расширяемую архитектуру, готовую к подключению базы данных
-- Отделить бизнес-логику от инфраструктурного кода
+## 🧭 Описание проекта
+
+Система моделирует работу центра управления спутниковыми группировками.
+
+Поддерживается:
+- создание орбитальных группировок;
+- добавление спутников разных типов;
+- активация спутников;
+- выполнение миссий;
+- контроль состояния энергии и активности.
+
+Проект построен с использованием **Spring Boot**, **DI**, **Lombok** и покрыт тестами.
 
 ---
 
-## 🧱 Используемые технологии
-- Java 21
-- Spring Boot 3
-- Gradle (Kotlin DSL)
-- UML (draw.io)
+## 🧱 Архитектура
+
+Проект разделён на слои:
+
+### Domain (доменная модель)
+- `Satellite` — абстрактный спутник
+- `CommunicationSatellite` — спутник связи
+- `ImagingSatellite` — спутник дистанционного зондирования
+- `EnergySystem` — энергетическая система спутника
+- `SatelliteState` — состояние спутника
+- `SatelliteConstellation` — спутниковая группировка
+
+### Repository
+- `ConstellationRepository` — хранение и доступ к группировкам
+
+### Service
+- `SpaceOperationCenterService` — бизнес-логика и сценарии управления
+
+### Application
+- `Main` — точка входа в приложение (Spring Boot)
 
 ---
 
-## 🧠 Реализованные принципы SOLID
+## 🧪 Тестирование
 
-### ✅ SRP — Single Responsibility Principle
-Каждый класс отвечает только за одну зону ответственности:
-- `EnergySystem` — управление энергией
-- `SatelliteState` — управление состоянием
-- `Satellite` — абстракция поведения спутника
-- `SpaceOperationCenterService` — сценарии работы с группировками
+Реализованы **три типа тестов**:
 
-### ✅ OCP — Open/Closed Principle
-Добавление новых типов спутников возможно без изменения существующего кода,
-достаточно унаследоваться от `Satellite`.
+### Unit tests
+- Проверяют логику классов в изоляции
+- Создание объектов через `new`
+- Пример: `ConstellationRepositoryUnitTest`
 
-### ✅ LSP — Liskov Substitution Principle
-Все наследники `Satellite` корректно заменяют базовый тип и используются полиморфно.
+### Mock tests
+- Используется Mockito
+- Проверяются взаимодействия компонентов
+- Пример: `ConstellationRepositoryMockTest`, `SpaceOperationCenterServiceMockTest`
 
-### ✅ DIP — Dependency Inversion Principle
-- `Main` не создаёт зависимости напрямую
-- Все сервисы и репозитории создаются Spring-контейнером
-- `SpaceOperationCenterService` получает `ConstellationRepository` через конструктор
+### Integration tests
+- Поднимается Spring Context
+- Используется DI (`@Autowired`)
+- Проверяется полный жизненный цикл объектов
+- Пример: `ConstellationRepositoryIntegrationTest`,
+  `SpaceOperationCenterServiceIntegrationTest`
 
 ---
 
-## 🗂 Архитектура проекта
+## 📊 Покрытие тестами
 
-```text
-src/main/java/seminars
-├── Main.java
-├── domain
-│   ├── constellation
-│   │   └── SatelliteConstellation.java
-│   └── satellite
-│       ├── Satellite.java
-│       ├── CommunicationSatellite.java
-│       ├── ImagingSatellite.java
-│       ├── EnergySystem.java
-│       └── SatelliteState.java
-├── repository
-│   └── ConstellationRepository.java
-└── service
-    └── SpaceOperationCenterService.java
+Для анализа покрытия используется **JaCoCo**.
+
+Минимальное покрытие недоменных классов: **≥ 60%**  
+Фактическое покрытие превышает требуемый минимум.
+
+---
+
+## 🚀 Запуск проекта
+
+### Запуск приложения
+```bash
+./gradlew bootRun
