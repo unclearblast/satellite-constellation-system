@@ -1,1 +1,1 @@
-settings.gradle.kts
+rootProject.name = "satellite-system"
