@@ -82,10 +82,6 @@
 ```bash
 ./gradlew bootRun
 
-### Запуск тестов
-```bash
 ./gradlew test
 
-### Генерация отчёта JaCoCo
-```bash
 ./gradlew test jacocoTestReport
