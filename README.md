@@ -29,6 +29,7 @@
 ---
 
 ## 🏗 Архитектура проекта
+'''
 com.example.space
 │
 ├── Main
@@ -54,7 +55,7 @@ com.example.space
 │
 └── service
 └── SpaceOperationCenterService
-
+'''
 
 ---
 
