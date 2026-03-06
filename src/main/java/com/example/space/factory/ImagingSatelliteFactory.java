@@ -1,19 +1,22 @@
 package com.example.space.factory;
 
-import com.example.space.domain.satellite.*;
+import com.example.space.domain.satellite.EnergySystem;
+import com.example.space.domain.satellite.ImagingSatellite;
+import com.example.space.domain.satellite.Satellite;
 import com.example.space.exception.SpaceOperationException;
-import com.example.space.param.*;
+import com.example.space.param.ImagingSatelliteParam;
+import com.example.space.param.SatelliteParam;
+import com.example.space.param.SatelliteType;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class ImagingSatelliteFactory implements SatelliteFactory {
 
     @Override
     public Satellite createSatelliteWithParameter(SatelliteParam param) {
 
         if (!(param instanceof ImagingSatelliteParam imagingParam)) {
-            throw new SpaceOperationException("Неверный тип параметра для спутника ДЗЗ");
+            throw new SpaceOperationException(
+                    "Неверный параметр для ImagingSatellite"
+            );
         }
 
         EnergySystem energy = EnergySystem.builder()
