@@ -1,34 +1,37 @@
 package com.example.space.factory;
 
-import com.example.space.domain.satellite.*;
+import com.example.space.domain.satellite.EnergySystem;
+import com.example.space.domain.satellite.ImagingSatellite;
+import com.example.space.domain.satellite.Satellite;
 import com.example.space.exception.SpaceOperationException;
-import com.example.space.param.*;
+import com.example.space.param.ImagingSatelliteParam;
+import com.example.space.param.SatelliteParam;
+import com.example.space.param.SatelliteType;
 
-import org.springframework.stereotype.Component;
-
-@Component
-public class CommunicationSatelliteFactory implements SatelliteFactory {
+public class ImagingSatelliteFactory implements SatelliteFactory {
 
     @Override
     public Satellite createSatelliteWithParameter(SatelliteParam param) {
 
-        if (!(param instanceof CommunicationSatelliteParam communicationParam)) {
-            throw new SpaceOperationException("Неверный тип параметра для спутника связи");
+        if (!(param instanceof ImagingSatelliteParam imagingParam)) {
+            throw new SpaceOperationException(
+                    "Неверный параметр для ImagingSatellite"
+            );
         }
 
         EnergySystem energy = EnergySystem.builder()
-                .batteryLevel(communicationParam.getBatteryLevel())
+                .batteryLevel(imagingParam.getBatteryLevel())
                 .build();
 
-        return new CommunicationSatellite(
-                communicationParam.getName(),
+        return new ImagingSatellite(
+                imagingParam.getName(),
                 energy,
-                communicationParam.getBandwidth()
+                imagingParam.getResolution()
         );
     }
 
     @Override
     public boolean isSatelliteTypeSupported(SatelliteType type) {
-        return type == SatelliteType.COMMUNICATION;
+        return type == SatelliteType.IMAGE;
     }
 }
