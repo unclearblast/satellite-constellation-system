@@ -1,284 +1,128 @@
-# Satellite Constellation System
+# 🛰 Satellite Constellation System
 
-### Seminar 7 — Structural Patterns (Facade, Decorator)
+Микросервисная система управления спутниковыми группировками с автоматическим выполнением миссий по расписанию.
 
-## 📚 Общая информация
+Проект состоит из **двух сервисов**:
 
-Данный проект реализует систему управления спутниковыми группировками.
-Работа выполнена в рамках **семинара 7**, посвящённого **структурным паттернам GoF**.
-
-Основная задача семинара — **оптимизация сервисного слоя** и **добавление инфраструктурной функциональности** через структурные паттерны.
-
-В системе используются следующие паттерны:
-
-| Паттерн             | Назначение                                                |
-| ------------------- | --------------------------------------------------------- |
-| **Facade**          | Упрощает работу с системой, предоставляя единый интерфейс |
-| **Decorator (AOP)** | Добавляет функциональность (измерение времени выполнения) |
-| **Factory Method**  | Инкапсулирует создание различных типов спутников          |
-| **Strategy**        | Выбирает фабрику создания спутника                        |
-| **Command**         | Параметры спутника описывают команду создания             |
+- 🛰 `space-operation-center` — основной сервис управления спутниками (Seminar 7)
+- ⏰ `mission-scheduler` — сервис-планировщик миссий (Seminar 8)
 
 ---
 
-# 🛰 Архитектура системы
+## 🚀 Архитектура
 
-Проект реализован по многослойной архитектуре:
 
-```
-domain
-├─ satellite
-├─ constellation
++------------------------+ HTTP (REST) +------------------------+
+| Mission Scheduler | -----------------------> | Space Operation Center |
+| (port 8081) | | (port 8080) |
++------------------------+ +------------------------+
 
-factory
-param
-repository
-service
-exception
-```
-
-### Domain Layer
-
-Содержит **бизнес-модели** системы.
-
-Основные сущности:
-
-* `Satellite`
-* `CommunicationSatellite`
-* `ImagingSatellite`
-* `SatelliteConstellation`
-* `EnergySystem`
-* `SatelliteState`
 
 ---
 
-# ⚙️ Паттерн Factory Method
+## 🛰 Space Operation Center (Seminar 7)
 
-Создание спутников реализовано через фабрики.
+### 📌 Возможности
 
-Интерфейс фабрики:
+- ➕ Добавление спутников
+- 🚀 Запуск миссий
+- 📊 Получение состояния системы
+- ❌ Вывод спутника из эксплуатации
 
-```
-SatelliteFactory
-```
+### 📡 API
 
-Методы:
+| Метод | Endpoint | Описание |
+|------|--------|----------|
+| POST | `/api/add-satellites` | Добавить спутники |
+| POST | `/api/missions` | Выполнить миссию |
+| GET  | `/api/overview` | Получить состояние |
+| DELETE | `/api/constellations/{constellation}/satellites/{satellite}` | Удалить спутник |
 
-```
-Satellite createSatelliteWithParameter(SatelliteParam param)
-boolean isSatelliteTypeSupported(SatelliteType type)
-```
+### 📘 Swagger
 
-Конкретные фабрики:
 
-```
-CommunicationSatelliteFactory
-ImagingSatelliteFactory
-```
+http://localhost:8080/swagger-ui.html
 
-Каждая фабрика:
-
-* принимает объект `SatelliteParam`
-* проверяет его тип через `instanceof`
-* извлекает параметры
-* создаёт соответствующий спутник
-
-Если параметр не поддерживается — выбрасывается:
-
-```
-SpaceOperationException
-```
 
 ---
 
-# 🧠 Паттерн Strategy
+## ⏰ Mission Scheduler (Seminar 8)
 
-Выбор фабрики делегируется сервису:
+### 📌 Возможности
 
-```
-SatelliteServiceImpl
-```
-
-Сервис получает список всех фабрик:
-
-```
-private final List<SatelliteFactory> factories
-```
-
-Алгоритм:
-
-1. Получить тип спутника
-2. Найти фабрику, поддерживающую этот тип
-3. Делегировать создание спутника фабрике
-
-Таким образом **алгоритм выбора фабрики инкапсулирован и легко расширяется**.
+- 📥 Читает миссии из `application.yml`
+- ⏱ Планирует выполнение через CRON
+- 🌐 Вызывает основной сервис через REST
+- 🧾 Логирует выполнение
+- ⚠️ Обрабатывает ошибки (не падает)
 
 ---
 
-# 📦 Паттерн Command
+## ⚙️ Конфигурация
 
-Параметры создания спутника инкапсулируются в классах:
+### `mission-scheduler/src/main/resources/application.yml`
 
-```
-SatelliteParam
-```
+```yaml
+server:
+  port: 8081
 
-Наследники:
+app:
+  space-center-service:
+    url: "http://localhost:8080/api"
+    missions:
+      - targetType: CONSTELLATION
+        constellationName: "GeoStationary"
+        cron: "0 0 */6 * * *"
 
-```
-ImagingSatelliteParam
-CommunicationSatelliteParam
-```
+      - targetType: SINGLE_SATELLITE
+        constellationName: "LowOrbit"
+        satelliteName: "Sat-1"
+        cron: "0 30 8 * * MON"
+⏱ CRON формат (Spring)
+секунда минута час день месяц день_недели
+Примеры
+Cron	Описание
+0 */1 * * * *	каждую минуту
+0 0 */6 * * *	каждые 6 часов
+0 30 8 * * MON	каждый понедельник 8:30
+▶️ Запуск
+1. Запуск основного сервиса
+cd space-operation-center
+./gradlew bootRun
+2. Запуск планировщика
+cd mission-scheduler
+./gradlew bootRun
+🧪 Проверка
 
-Такая структура:
+После запуска scheduler:
 
-* инкапсулирует данные
-* упрощает расширение системы
-* уменьшает количество параметров методов
+Executing mission...
+Mission success...
 
----
+Если основной сервис выключен:
 
-# 🧱 Паттерн Facade
+Mission failed: Connection refused
 
-Для упрощения взаимодействия с системой реализован фасад:
+👉 Это нормально — сервис устойчив к ошибкам.
 
-```
-SpaceOperationCenterService
-```
+🧱 Технологии
+Java 17+
+Spring Boot 3.x
+Spring Web
+RestClient (Spring 6.1+)
+Spring Scheduling
+Lombok
+OpenAPI / Swagger
+🧠 Особенности реализации
+✔ ConfigurationProperties
 
-Он агрегирует все основные сценарии:
+Все миссии хранятся в YAML:
 
-```
-createAndSaveConstellation
-addSatellite
-activateAllSatellites
-executeConstellationMission
-showConstellationStatus
-executeMission
-```
-
-Пользователь системы взаимодействует **только с фасадом**, не зная о внутренней архитектуре.
-
-Это уменьшает связанность и упрощает использование системы.
-
----
-
-# 🎭 Паттерн Decorator (AOP)
-
-В системе реализован механизм измерения времени выполнения методов.
-
-Создана аннотация:
-
-```
-@MeasureExecutionTime
-```
-
-Аспект:
-
-```
-ExecutionTimeAspect
-```
-
-Он перехватывает вызовы методов с аннотацией и выводит:
-
-```
-⏱ Метод выполнен за X ms
-```
-
-Это пример **декоратора**, реализованного через **Aspect-Oriented Programming**.
-
----
-
-# 🧪 Тестирование
-
-Добавлены тесты:
-
-### SatelliteFactoryTest
-
-Проверяет:
-
-* создание спутников
-* корректную работу фабрик
-* использование параметров
-
-### SatelliteServiceTest
-
-Интеграционный тест, проверяющий:
-
-* выбор фабрики
-* создание спутника через сервис
-* корректную работу Strategy
-
----
-
-# 📈 Принципы SOLID
-
-В проекте соблюдаются основные принципы SOLID.
-
-### Single Responsibility Principle
-
-Каждый класс отвечает за одну задачу:
-
-* фабрики создают спутники
-* сервисы выполняют бизнес-операции
-* репозиторий хранит данные
-
----
-
-### Open/Closed Principle
-
-Система расширяется **без изменения существующего кода**.
-
-Чтобы добавить новый тип спутника:
-
-1. создать новый `Satellite`
-2. создать новый `SatelliteParam`
-3. создать новую `SatelliteFactory`
-
----
-
-### Dependency Inversion Principle
-
-Сервисы зависят от **абстракций**, а не конкретных классов:
-
-```
-List<SatelliteFactory>
-```
-
----
-
-# 🚀 Пример работы системы
-
-При запуске система выводит:
-
-```
-🚀 ЗАПУСК СИСТЕМЫ УПРАВЛЕНИЯ СПУТНИКОВОЙ ГРУППИРОВКОЙ
-============================================================
-
-Создана и сохранена группировка: Орбита-1
-Создана и сохранена группировка: Орбита-2
-
-CommunicationSatellite{name='Связь-1'} добавлен в группировку 'Орбита-1'
-ImagingSatellite{name='ДЗЗ-1'} добавлен в группировку 'Орбита-1'
-
-Связь-1: Передача данных со скоростью 500 Мбит/с
-ДЗЗ-1: Съемка территории (2.5 м/пиксель)
-```
-
----
-
-# 📌 Итог
-
-В рамках семинара реализованы:
-
-* структурный паттерн **Facade**
-* структурный паттерн **Decorator**
-* поведенческий паттерн **Strategy**
-* порождающий паттерн **Factory Method**
-
-Архитектура системы стала:
-
-* более расширяемой
-* менее связанной
-* удобной для использования
-* соответствующей принципам SOLID.
+@ConfigurationProperties(prefix = "app.space-center-service")
+✔ Планировщик
+taskScheduler.schedule(task, new CronTrigger(cron));
+✔ HTTP клиент
+restClient.post()
+    .uri("/missions")
+    .body(request)
+    .retrieve()
