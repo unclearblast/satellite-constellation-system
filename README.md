@@ -1,26 +1,13 @@
 # 🛰 Satellite Constellation System
 
-Микросервисная система управления спутниковыми группировками с автоматическим выполнением миссий по расписанию.
+Микросервисная система управления спутниковыми группировками с автоматическим выполнением миссий по расписанию.  
+Проект полностью контейнеризован и запускается через **Docker Compose**.
 
-Проект состоит из **двух сервисов**:
+- **Сеть**: пользовательская Docker-сеть `satellite-net`
+- **DNS внутри сети**: `server` → контейнер основного сервиса
+- **Конфигурация**: адрес сервера передаётся через переменную окружения `SERVER_URL`
 
-- 🛰 `space-operation-center` — основной сервис управления спутниками (Seminar 7)
-- ⏰ `mission-scheduler` — сервис-планировщик миссий (Seminar 8)
-
----
-
-## 🚀 Архитектура
-
-
-+------------------------+ HTTP (REST) +------------------------+
-| Mission Scheduler | -----------------------> | Space Operation Center |
-| (port 8081) | | (port 8080) |
-+------------------------+ +------------------------+
-
-
----
-
-## 🛰 Space Operation Center (Seminar 7)
+## 🛰 Space Operation Center (сервер)
 
 ### 📌 Возможности
 
@@ -31,98 +18,93 @@
 
 ### 📡 API
 
-| Метод | Endpoint | Описание |
-|------|--------|----------|
-| POST | `/api/add-satellites` | Добавить спутники |
-| POST | `/api/missions` | Выполнить миссию |
-| GET  | `/api/overview` | Получить состояние |
-| DELETE | `/api/constellations/{constellation}/satellites/{satellite}` | Удалить спутник |
+| Метод   | Endpoint                                                   | Описание                |
+|---------|------------------------------------------------------------|-------------------------|
+| POST    | `/api/add-satellites`                                      | Добавить спутники       |
+| POST    | `/api/missions`                                            | Выполнить миссию        |
+| GET     | `/api/overview`                                            | Получить состояние      |
+| DELETE  | `/api/constellations/{constellation}/satellites/{satellite}` | Удалить спутник         |
 
-### 📘 Swagger
+### 📘 Swagger UI
 
+После запуска доступен по адресу:  
+👉 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-http://localhost:8080/swagger-ui.html
-
-
----
-
-## ⏰ Mission Scheduler (Seminar 8)
+## ⏰ Mission Scheduler (клиент)
 
 ### 📌 Возможности
 
-- 📥 Читает миссии из `application.yml`
-- ⏱ Планирует выполнение через CRON
-- 🌐 Вызывает основной сервис через REST
-- 🧾 Логирует выполнение
-- ⚠️ Обрабатывает ошибки (не падает)
+- 📥 Читает список миссий из `application.yml`
+- ⏱ Планирует их выполнение по CRON-выражениям
+- 🌐 Вызывает API основного сервиса по HTTP
+- 🧾 Логирует результаты
+- ⚠️ Устойчив к ошибкам соединения (не прекращает работу)
 
----
+## 🐳 Запуск через Docker Compose (Семинар 9)
 
-## ⚙️ Конфигурация
+### 📦 Состав контейнеров
 
-### `mission-scheduler/src/main/resources/application.yml`
+| Сервис          | Порт на хосте | Внутренний порт | Имя контейнера        |
+|-----------------|---------------|-----------------|-----------------------|
+| space-center    | 8080          | 8080            | space-center-server   |
+| mission-service | 8081          | 8081            | mission-scheduler     |
 
-```yaml
-server:
-  port: 8081
+### ⚙️ Переменные окружения
 
-app:
-  space-center-service:
-    url: "http://localhost:8080/api"
-    missions:
-      - targetType: CONSTELLATION
-        constellationName: "GeoStationary"
-        cron: "0 0 */6 * * *"
+| Переменная      | Сервис         | Описание                           | Значение по умолчанию    |
+|-----------------|----------------|------------------------------------|--------------------------|
+| `SERVER_PORT`   | server         | Порт, на котором слушает сервер    | `8080`                   |
+| `SERVER_PORT`   | mission-service| Порт, на котором слушает клиент    | `8081`                   |
+| `SERVER_URL`    | mission-service| URL основного сервиса              | `http://localhost:8080`  |
 
-      - targetType: SINGLE_SATELLITE
-        constellationName: "LowOrbit"
-        satelliteName: "Sat-1"
-        cron: "0 30 8 * * MON"
+### ▶️ Запуск
+
+1. Убедитесь, что Docker и Docker Compose установлены.
+2. Из корня проекта выполните:
+
+```bash
+docker-compose up --build
+
+3. Дождитесь сообщений о готовности (healthcheck сервера проходит за ~10 секунд).
+
+\Структура проекта (после Docker-обновления)
+text
+satellite-constellation-system/
+├── docker-compose.yml
+├── .dockerignore
+├── space-operation-center/
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── build.gradle
+│   ├── src/...
+│   └── src/main/resources/application.yml
+├── mission-scheduler/
+│   ├── Dockerfile
+│   ├── .dockerignore
+│   ├── build.gradle
+│   ├── src/...
+│   └── src/main/resources/application.yml
+└── README.md
+
+⚙️ Локальный запуск (без Docker)
+Если вы хотите запустить сервисы локально (например, для отладки):
+
+1. Space Operation Center
+bash
+cd space-operation-center
+./gradlew bootRun
+2. Mission Scheduler
+bash
+cd mission-scheduler
+./gradlew bootRun
+При локальном запуске убедитесь, что в application.yml планировщика указан корректный URL сервера (по умолчанию http://localhost:8080/api).
+
 ⏱ CRON формат (Spring)
+Spring использует шестипозиционный CRON:
 секунда минута час день месяц день_недели
+
 Примеры
 Cron	Описание
 0 */1 * * * *	каждую минуту
 0 0 */6 * * *	каждые 6 часов
-0 30 8 * * MON	каждый понедельник 8:30
-▶️ Запуск
-1. Запуск основного сервиса
-cd space-operation-center
-./gradlew bootRun
-2. Запуск планировщика
-cd mission-scheduler
-./gradlew bootRun
-🧪 Проверка
-
-После запуска scheduler:
-
-Executing mission...
-Mission success...
-
-Если основной сервис выключен:
-
-Mission failed: Connection refused
-
-👉 Это нормально — сервис устойчив к ошибкам.
-
-🧱 Технологии
-Java 17+
-Spring Boot 3.x
-Spring Web
-RestClient (Spring 6.1+)
-Spring Scheduling
-Lombok
-OpenAPI / Swagger
-🧠 Особенности реализации
-✔ ConfigurationProperties
-
-Все миссии хранятся в YAML:
-
-@ConfigurationProperties(prefix = "app.space-center-service")
-✔ Планировщик
-taskScheduler.schedule(task, new CronTrigger(cron));
-✔ HTTP клиент
-restClient.post()
-    .uri("/missions")
-    .body(request)
-    .retrieve()
+0 30 8 * * MON	каждый понедельник в 8:30
