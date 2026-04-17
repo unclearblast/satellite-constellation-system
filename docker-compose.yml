@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  server:
+    build: ./space-operation-center
+    container_name: space-center-server
+    environment:
+      - SERVER_PORT=8080
+    ports:
+      - "8080:8080"
+    networks:
+      - satellite-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mission-service:
+    build: ./mission-scheduler
+    container_name: mission-scheduler
+    environment:
+      - SERVER_PORT=8081
+      - SERVER_URL=http://server:8080
+    ports:
+      - "8081:8081"
+    networks:
+      - satellite-net
+    depends_on:
+      server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+networks:
+  satellite-net:
+    driver: bridge
