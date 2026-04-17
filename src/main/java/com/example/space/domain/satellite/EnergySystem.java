@@ -1,1 +1,38 @@
-package com.example.space.domain.satellite; public class EnergySystem { private double batteryLevel; private EnergySystem(Builder builder) { this.batteryLevel = builder.batteryLevel; } public static Builder builder() { return new Builder(); } public boolean canActivate() { return batteryLevel > 0.2; } public void consume(double amount) { batteryLevel = Math.max(0, batteryLevel - amount); } public double getBatteryLevel() { return batteryLevel; } @Override public String toString() { return "EnergySystem{batteryLevel=" + batteryLevel + '}'; } public static class Builder { private double batteryLevel = 1.0; public Builder batteryLevel(double value) { this.batteryLevel = value; return this; } public EnergySystem build() { return new EnergySystem(this); } } }
+package com.example.spacecenter.domain.energy;
+
+import com.example.spacecenter.domain.satellite.Satellite;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "energy_system")
+@Data
+@NoArgsConstructor
+public class EnergySystem {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "power_capacity_watts", nullable = false)
+    private Double powerCapacityWatts;
+
+    @Column(name = "current_power_watts", nullable = false)
+    private Double currentPowerWatts;
+
+    @Column(name = "battery_capacity_watt_hours")
+    private Double batteryCapacityWattHours;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EnergySystemStatus status = EnergySystemStatus.NOMINAL;
+
+    // Обратная связь для удобства, но владельцем является Satellite
+    @OneToOne(mappedBy = "energySystem")
+    private Satellite satellite;
+
+    public enum EnergySystemStatus {
+        NOMINAL, LOW_POWER, CRITICAL, CHARGING
+    }
+}
