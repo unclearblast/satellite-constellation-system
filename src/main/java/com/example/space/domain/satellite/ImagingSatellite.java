@@ -1,17 +1,24 @@
-package com.example.space.domain.satellite;
+package com.example.spacecenter.domain.satellite;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Entity
+@DiscriminatorValue("IMAGING")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class ImagingSatellite extends Satellite {
 
-    private final double resolution;
-    private int photosTaken;
+    @Column(name = "resolution_meters")
+    private Double resolutionMeters; // метры на пиксель
 
-    public ImagingSatellite(String name,
-                            EnergySystem energy,
-                            double resolution) {
-        super(name, energy);
-        this.resolution = resolution;
-    }
-
+    @Column(name = "sensor_type")
+    private String sensorType; // "Optical", "SAR", "Infrared"
     @Override
     public void performMission() {
 
