@@ -1,16 +1,24 @@
-package com.example.space.domain.satellite;
+package com.example.spacecenter.domain.satellite;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@Entity
+@DiscriminatorValue("COMMUNICATION")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class CommunicationSatellite extends Satellite {
 
-    private final double bandwidth;
+    @Column(name = "frequency_band")
+    private String frequencyBand; // например, "Ka-band", "Ku-band"
 
-    public CommunicationSatellite(String name,
-                                  EnergySystem energy,
-                                  double bandwidth) {
-        super(name, energy);
-        this.bandwidth = bandwidth;
-    }
-
+    @Column(name = "transponder_count")
+    private Integer transponderCount;
     @Override
     public void performMission() {
 
