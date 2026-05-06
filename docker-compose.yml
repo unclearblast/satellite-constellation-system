@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  # Существующие сервисы (пример)
+  postgres-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: space_center
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5432:5432"
+    networks:
+      - space-net
+
+  space-operation-center:
+    build: ./space-operation-center
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
+      - telemetry-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/space_center
+      GRPC_CLIENT_TELEMETRY_SERVICE_ADDRESS: static://telemetry-service:9091
+    networks:
+      - space-net
+
+  telemetry-service:
+    build: ./telemetry-service
+    ports:
+      - "9091:9091"
+    networks:
+      - space-net
+
+networks:
+  space-net:
+    driver: bridge

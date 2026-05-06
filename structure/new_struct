@@ -1,0 +1,65 @@
+satellite-constellation-system/
+│
+├── space-operation-center/              # 🛰 Основной сервис (семинар 7)
+│   └── src/
+│       └── main/
+│           ├── java/com/example/spacecenter/
+│           │   ├── SpaceOperationCenterApplication.java
+│           │   │
+│           │   ├── controller/
+│           │   │   └── SpaceOperationController.java
+│           │   │
+│           │   ├── service/
+│           │   │   └── SpaceOperationCenterService.java
+│           │   │
+│           │   ├── facade/
+│           │   │   └── SpaceOperationFacade.java
+│           │   │
+│           │   ├── domain/
+│           │   │   ├── satellite/
+│           │   │   ├── constellation/
+│           │   │   └── mission/
+│           │   │
+│           │   ├── dto/
+│           │   │   ├── MissionRequest.java
+│           │   │   └── SatelliteRequest.java
+│           │   │
+│           │   ├── config/
+│           │   │   └── OpenApiConfig.java
+│           │   │
+│           │   └── exception/
+│           │       └── GlobalExceptionHandler.java
+│           │
+│           └── resources/
+│               └── application.yml
+│
+├── mission-scheduler/                   # ⏰ Планировщик (семинар 8)
+│   └── src/
+│       └── main/
+│           ├── java/com/example/missionscheduler/
+│           │   ├── MissionSchedulerApplication.java
+│           │   │
+│           │   ├── configuration/
+│           │   │   └── RestClientConfig.java
+│           │   │
+│           │   ├── properties/
+│           │   │   ├── SpaceCenterProperties.java
+│           │   │   └── MissionConfig.java
+│           │   │
+│           │   ├── domain/
+│           │   │   └── TargetType.java
+│           │   │
+│           │   ├── dto/
+│           │   │   └── MissionRequest.java
+│           │   │
+│           │   ├── client/
+│           │   │   └── SpaceOperationClient.java
+│           │   │
+│           │   └── service/
+│           │       └── ConfiguredMissionScheduler.java
+│           │
+│           └── resources/
+│               └── application.yml
+│
+├── README.md
+└── build.gradle (или settings.gradle если multi-module)
