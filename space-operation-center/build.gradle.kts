@@ -21,7 +21,7 @@ dependencies {
     
     testImplementation("com.h2database:h2") // для тестов
 }
-
+runtimeOnly("com.h2database:h2")
 tasks.named('test') {
     useJUnitPlatform()
 }
