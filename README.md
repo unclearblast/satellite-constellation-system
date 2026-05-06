@@ -79,30 +79,3 @@ PostgreSQL
 Docker & Docker Compose
 
 Gradle (Kotlin DSL)
-
-📁 Структура проекта
-text
-satellite-constellation-system/
-├── docker-compose.yml
-├── build.gradle.kts (корневой)
-├── settings.gradle.kts
-├── space-operation-center/
-│   ├── src/main/java/com/example/spacecenter/
-│   │   ├── controller/       # REST API
-│   │   ├── service/          # бизнес-логика
-│   │   ├── grpc/             # gRPC клиент (TelemetryConsumerService)
-│   │   ├── repository/       # JPA-репозитории
-│   │   └── domain/           # сущности (Satellite, Constellation...)
-│   ├── src/main/proto/       # telemetry.proto (скопирован)
-│   └── Dockerfile
-└── telemetry-service/
-    ├── src/main/java/com/example/telemetry/
-    │   ├── TelemetryServiceApplication.java
-    │   └── TelemetryGrpcService.java    # gRPC сервер
-    ├── src/main/proto/                  # telemetry.proto (оригинал)
-    ├── Dockerfile
-    └── build.gradle.kts
-🧠 Дополнительные задания (для саморазвития)
-Реальный список спутников – заставить telemetry-service ходить в REST space-operation-center за актуальными ID спутников, чтобы не использовать мок-список.
-
-Двусторонний стриминг – клиент может подписываться/отписываться от конкретных спутников, отправляя команды в потоке.
