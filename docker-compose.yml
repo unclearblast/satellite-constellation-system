@@ -1,40 +1,37 @@
 version: '3.8'
-
 services:
-  server:
-    build: ./space-operation-center
-    container_name: space-center-server
+  # Существующие сервисы (пример)
+  postgres-db:
+    image: postgres:15-alpine
     environment:
-      - SERVER_PORT=8080
+      POSTGRES_DB: space_center
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5432:5432"
+    networks:
+      - space-net
+
+  space-operation-center:
+    build: ./space-operation-center
     ports:
       - "8080:8080"
-    networks:
-      - satellite-net
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  mission-service:
-    build: ./mission-scheduler
-    container_name: mission-scheduler
-    environment:
-      - SERVER_PORT=8081
-      - SERVER_URL=http://server:8080
-    ports:
-      - "8081:8081"
-    networks:
-      - satellite-net
     depends_on:
-      server:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
+      - postgres-db
+      - telemetry-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/space_center
+      GRPC_CLIENT_TELEMETRY_SERVICE_ADDRESS: static://telemetry-service:9091
+    networks:
+      - space-net
+
+  telemetry-service:
+    build: ./telemetry-service
+    ports:
+      - "9091:9091"
+    networks:
+      - space-net
 
 networks:
-  satellite-net:
+  space-net:
     driver: bridge
