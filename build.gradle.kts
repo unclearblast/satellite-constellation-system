@@ -13,6 +13,7 @@ allprojects {
         mavenCentral()
     }
 }
+runtimeOnly("com.h2database:h2")
 
 subprojects {
     apply(plugin = "java")
