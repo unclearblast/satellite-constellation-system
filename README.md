@@ -1,142 +1,108 @@
-# 🛰 Satellite Constellation Management System
+# 🛰️ Система управления спутниковой группировкой
 
-Микросервисное приложение для управления группировками спутников, реализованное с использованием Spring Boot и Spring Data JPA. Проект демонстрирует интеграцию реляционной базы данных (PostgreSQL) для постоянного хранения информации о спутниках, группировках и энергосистемах, а также предоставляет REST API для выполнения CRUD-операций.
+Проект демонстрирует микросервисную архитектуру с синхронным (REST) и асинхронным потоковым (gRPC) взаимодействием.
 
----
+## 📦 Состав микросервисов
 
-## 📌 Особенности
+| Сервис | Порт | Описание |
+|--------|------|-----------|
+| **space-operation-center** | 8080 (REST) | Основной сервер: управление спутниками, созвездиями, хранение данных в PostgreSQL. |
+| **mission-scheduler** | 8090 (REST) | Планировщик миссий (опционально, добавлен ранее). |
+| **telemetry-service** | 9091 (gRPC) | Эмулятор телеметрии: стримит каждые 2 секунды температуру трёх спутников. |
 
-- Хранение данных в PostgreSQL с отключённой автоматической генерацией DDL (используется ручная схема)
-- Использование Spring Data JPA и Hibernate для объектно-реляционного отображения
-- Поддержка иерархии спутников (`CommunicationSatellite`, `ImagingSatellite`) через стратегию `SINGLE_TABLE`
-- Связи между сущностями: `@ManyToOne`, `@OneToMany`, `@OneToOne`
-- RESTful API с полным набором CRUD-операций для каждой сущности
-- Индексы для ускорения поиска по часто используемым полям
-- Модульные тесты репозиториев с использованием встроенной H2
-- Документирование API через Swagger/OpenAPI
+## 🔄 Взаимодействие сервисов
 
----
+- `space-operation-center` → `telemetry-service` по **gRPC Server Streaming** (подписывается на поток телеметрии).
+- Полученные температуры (внутри/снаружи) сохраняются в БД в таблицу `satellite`.
+- При желании `telemetry-service` может получать реальный список спутников через REST от `space-operation-center` (доп. задание).
 
-## 🧰 Технологический стек
+## 🚀 Запуск (Docker Compose)
 
-- **Java 17**
-- **Spring Boot 3.2.x**
-- **Spring Data JPA**
-- **PostgreSQL** (основная БД)
-- **H2** (для тестирования)
-- **Gradle (Kotlin DSL)**
-- **Lombok**
-- **Swagger / springdoc-openapi**
+Убедитесь, что установлены **Docker** и **Docker Compose**.
 
----
+1. **Клонируйте репозиторий**
+   ```bash
+   git clone https://github.com/your-org/satellite-constellation-system.git
+   cd satellite-constellation-system
+Скопируйте proto-файл в основной сервер (для генерации клиентских классов)
 
-## ⚙️ Требования для запуска
+bash
+cp telemetry-service/src/main/proto/telemetry.proto space-operation-center/src/main/proto/
+Сгенерируйте gRPC-классы (если не делали в IDE)
 
-- JDK 17+
-- Gradle 8+
-- PostgreSQL 14+ (либо Docker-образ)
-- Свободный порт `8080`
+bash
+cd telemetry-service && ./gradlew generateProto
+cd ../space-operation-center && ./gradlew generateProto
+cd ..
+Соберите и запустите все сервисы
 
----
+bash
+docker-compose up --build
+Сервисы поднимутся в одной сети space-net:
 
-## 🗄 Настройка базы данных
+PostgreSQL на порту 5432
 
-1. Установите и запустите PostgreSQL.
-2. Создайте базу данных:
+space-operation-center на http://localhost:8080
 
-   ```sql
-   CREATE DATABASE satellite_db;
-Убедитесь, что параметры подключения в application.yml соответствуют вашей установке:
+telemetry-service на localhost:9091 (gRPC)
 
-yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/satellite_db
-    username: postgres
-    password: postgres
-При запуске приложения Spring выполнит скрипт schema.sql, который создаст все необходимые таблицы и индексы.
-Автоматическая генерация DDL отключена (ddl-auto: none) для полного контроля над схемой.
+Проверьте работу
 
-## 🚀 Сборка и запуск
+Откройте http://localhost:8080/swagger-ui.html (если настроен OpenAPI)
 
-### Сборка проекта
+Или через curl проверьте, что у спутников появились температуры:
 
-`./gradlew clean build`
+bash
+curl http://localhost:8080/api/satellites/1
+В ответе должны быть поля insideTemperature и outsideTemperature.
 
-### Запуск основного сервиса
+🧪 Что происходит внутри?
+telemetry-service генерирует случайные температуры для спутников 1, 2, 3 раз в 2 секунды.
 
-`./gradlew :space-operation-center:bootRun`
+space-operation-center при старте подключается к gRPC-потоку и слушает обновления.
 
-После старта приложение будет доступно по адресу:  
-👉 **http://localhost:8080**
+Каждое обновление сохраняется в БД через JPA.
 
-Swagger UI доступен по адресу:  
-👉 **http://localhost:8080/swagger-ui.html**
+Стрим длится 2 минуты (60 итераций), затем сервер завершает поток.
 
----
+🛠️ Технологии
+Java 17
 
-## 📡 API Эндпоинты
+Spring Boot 3.2
 
-### Группировки спутников (`/api/constellations`)
+gRPC + protobuf
 
-| Метод  | URL                           | Описание                         |
-|--------|-------------------------------|----------------------------------|
-| GET    | `/api/constellations`         | Получить все группировки         |
-| GET    | `/api/constellations/{id}`    | Получить группировку по ID       |
-| POST   | `/api/constellations`         | Создать новую группировку        |
-| PUT    | `/api/constellations/{id}`    | Обновить группировку             |
-| DELETE | `/api/constellations/{id}`    | Удалить группировку              |
+Spring Data JPA / Hibernate
 
-### Спутники (`/api/satellites`)
+PostgreSQL
 
-| Метод  | URL                                                | Описание                              |
-|--------|----------------------------------------------------|---------------------------------------|
-| GET    | `/api/satellites`                                  | Получить все спутники                 |
-| GET    | `/api/satellites/{id}`                             | Получить спутник по ID                |
-| POST   | `/api/satellites`                                  | Создать новый спутник                 |
-| PUT    | `/api/satellites/{id}`                             | Обновить спутник                      |
-| DELETE | `/api/satellites/{id}`                             | Удалить спутник                       |
-| PATCH  | `/api/satellites/{id}/assign-constellation/{cid}`  | Назначить спутник в группировку       |
+Docker & Docker Compose
 
-### Энергосистемы (`/api/energy-systems`)
+Gradle (Kotlin DSL)
 
-| Метод  | URL                           | Описание                         |
-|--------|-------------------------------|----------------------------------|
-| GET    | `/api/energy-systems`         | Получить все энергосистемы       |
-| GET    | `/api/energy-systems/{id}`    | Получить энергосистему по ID     |
-| POST   | `/api/energy-systems`         | Создать энергосистему            |
-| PUT    | `/api/energy-systems/{id}`    | Обновить энергосистему           |
-| DELETE | `/api/energy-systems/{id}`    | Удалить энергосистему            |
+📁 Структура проекта
+text
+satellite-constellation-system/
+├── docker-compose.yml
+├── build.gradle.kts (корневой)
+├── settings.gradle.kts
+├── space-operation-center/
+│   ├── src/main/java/com/example/spacecenter/
+│   │   ├── controller/       # REST API
+│   │   ├── service/          # бизнес-логика
+│   │   ├── grpc/             # gRPC клиент (TelemetryConsumerService)
+│   │   ├── repository/       # JPA-репозитории
+│   │   └── domain/           # сущности (Satellite, Constellation...)
+│   ├── src/main/proto/       # telemetry.proto (скопирован)
+│   └── Dockerfile
+└── telemetry-service/
+    ├── src/main/java/com/example/telemetry/
+    │   ├── TelemetryServiceApplication.java
+    │   └── TelemetryGrpcService.java    # gRPC сервер
+    ├── src/main/proto/                  # telemetry.proto (оригинал)
+    ├── Dockerfile
+    └── build.gradle.kts
+🧠 Дополнительные задания (для саморазвития)
+Реальный список спутников – заставить telemetry-service ходить в REST space-operation-center за актуальными ID спутников, чтобы не использовать мок-список.
 
----
-
-## 🧪 Модульное тестирование
-
-Для тестирования репозиториев используется встроенная H2 in-memory база данных.  
-Тесты находятся в `src/test/java/com/example/spacecenter/repository/`.
-
-Запуск тестов:
-
-`./gradlew :space-operation-center:test`
-
----
-
-## ❓ Вопрос: `@Embedded` или `@OneToOne`?
-
-| Критерий                 | `@Embedded`                                                                 | `@OneToOne`                                                                                         |
-|--------------------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| **Независимость объекта** | Объект не имеет собственной идентичности и не может существовать отдельно от родителя | Объект является самостоятельной сущностью со своим жизненным циклом                                   |
-| **Схема БД**             | Поля встраиваются в таблицу родительской сущности                            | Создаётся отдельная таблица с внешним ключом                                                          |
-| **Доступ**               | Только через родительскую сущность                                           | Можно работать напрямую через отдельный репозиторий                                                   |
-| **Производительность**   | Выгодно для небольших и часто используемых данных                            | Полезно выносить редко используемые или объёмные данные в отдельную таблицу                           |
-| **Нормализация**         | Нарушает 1НФ (если смотреть как на вложенную структуру)                      | Соответствует нормальным формам                                                                       |
-
-### В проекте
-
-Для `EnergySystem` выбрана связь **`@OneToOne`**, потому что:
-
-- Энергосистема может быть сложным объектом с большим количеством параметров, которые не всегда нужны при выборке спутника.
-- Требуется отдельное управление энергосистемами (свой контроллер, репозиторий).
-- Возможна замена энергосистемы без удаления спутника.
-
-Если бы энергосистема состояла из пары полей (например, `batteryLevel` и `powerStatus`), не имела бы собственной бизнес-логики и всегда использовалась вместе со спутником — можно было бы применить `@Embedded`.
+Двусторонний стриминг – клиент может подписываться/отписываться от конкретных спутников, отправляя команды в потоке.
