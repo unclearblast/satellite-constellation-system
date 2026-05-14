@@ -1,0 +1,27 @@
+satellite-constellation-system/
+├── docker-compose.yml                     # Новый (или дополняем существующий)
+├── build.gradle.kts                       # Корневой (возможно добавление общих свойств)
+├── space-operation-center/
+│   ├── build.gradle.kts                   # ИЗМЕНЁН (добавлена зависимость spring-kafka)
+│   ├── src/main/java/com/example/spaceoperation/
+│   │   ├── dto/
+│   │   │   └── SatelliteEvent.java        # НОВЫЙ (DTO события)
+│   │   ├── service/
+│   │   │   └── SatelliteService.java      # ИЗМЕНЁН (добавлена отправка событий)
+│   └── src/main/resources/
+│       └── application.yml                # ИЗМЕНЁН (секция spring.kafka.producer)
+├── telemetry-service/
+│   ├── build.gradle.kts                   # ИЗМЕНЁН (добавлена зависимость spring-kafka)
+│   ├── src/main/java/com/example/telemetry/
+│   │   ├── dto/
+│   │   │   └── SatelliteEvent.java        # НОВЫЙ (DTO события, должен совпадать с отправителем)
+│   │   ├── listener/
+│   │   │   └── SatelliteEventListener.java # НОВЫЙ (KafkaListener)
+│   └── src/main/resources/
+│       └── application.yml                # ИЗМЕНЁН (секция spring.kafka.consumer + listener)
+└── mission-scheduler/                     # Аналогично telemetry-service (если требуется)
+    ├── build.gradle.kts
+    ├── src/main/java/com/example/mission/
+    │   ├── dto/SatelliteEvent.java
+    │   ├── listener/SatelliteEventListener.java
+    └── src/main/resources/application.yml
