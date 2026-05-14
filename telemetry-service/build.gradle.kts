@@ -21,6 +21,8 @@ dependencies {
     implementation("net.devh:grpc-server-spring-boot-starter:2.15.0.RELEASE")
     implementation("io.grpc:grpc-protobuf:1.62.2")
     implementation("io.grpc:grpc-stub:1.62.2")
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
     compileOnly("org.apache.tomcat:annotations-api:6.0.53")
 }
 
