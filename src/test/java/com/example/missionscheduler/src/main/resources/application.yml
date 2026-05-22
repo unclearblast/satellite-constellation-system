@@ -1,0 +1,16 @@
+server:
+  port: ${SERVER_PORT:8081}
+
+space:
+  center:
+    url: ${SERVER_URL:http://localhost:8080}
+
+spring:
+  application:
+    name: mission-scheduler
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

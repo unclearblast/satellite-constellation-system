@@ -1,0 +1,25 @@
+satellite-api-tests/
+├── build.gradle.kts
+├── settings.gradle.kts
+├── README.md
+└── src/
+    └── test/
+        ├── java/com/example/tests/
+        │   ├── config/
+        │   │   └── TestConfig.java
+        │   ├── endpoints/
+        │   │   ├── SatelliteEndpoints.java
+        │   │   ├── ConstellationEndpoints.java
+        │   │   └── EnergySystemEndpoints.java
+        │   ├── models/
+        │   │   ├── Satellite.java
+        │   │   ├── Constellation.java
+        │   │   └── EnergySystem.java
+        │   ├── tests/
+        │   │   ├── SatelliteTests.java
+        │   │   ├── ConstellationTests.java
+        │   │   └── EnergySystemTests.java
+        │   └── utils/
+        │       └── AllureUtils.java
+        └── resources/
+            └── allure.properties

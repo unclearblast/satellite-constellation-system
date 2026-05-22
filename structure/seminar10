@@ -1,0 +1,17 @@
+satellite-constellation-system/
+├── build.gradle.kts (корневой, добавлен модуль)
+├── settings.gradle.kts
+├── space-operation-center/   (существующий сервер)
+├── mission-scheduler/        (существующий)
+└── telemetry-service/        (новый)
+    ├── build.gradle.kts
+    ├── Dockerfile
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/com/example/telemetry/
+    │   │   │   └── TelemetryServiceApplication.java
+    │   │   ├── proto/
+    │   │   │   └── telemetry.proto
+    │   │   └── resources/
+    │   │       └── application.yml
+    │   └── test/
