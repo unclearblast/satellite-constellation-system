@@ -1,5 +1,11 @@
 # 🛰️ Satellite API Tests
 
+!ВНИМАНИЕ! НА РАБОЧЕМ КОМПЬЮТЕРЕ У МЕНЯ АППАРАТНО НЕ ПОДДЕРЖИВАЕТСЯ DOCKER COMPOSE!
+Как следствие, дозвониться до enpoint'ов я не могу при всём желании.
+![Uploading 3b716116f689f4777be4f0400b8c1676.png…]()
+
+
+
 Автотесты для API системы управления группировкой спутников (Space Operation Center).  
 Проект написан на **Java + Gradle**, использует **JUnit 5**, **RestAssured** и **Allure Report**.
 
@@ -34,23 +40,6 @@ allure serve build/allure-results
 
 Каждый метод проверяется позитивным сценарием (минимальный набор полей, ожидаемый код ответа)
 
-📁 Структура проекта
-
-src/test/java/com/example/tests/
-├── config/TestConfig.java              # Базовая настройка RestAssured
-├── endpoints/                          # Классы для каждого ресурса
-│   ├── SatelliteEndpoints.java
-│   ├── ConstellationEndpoints.java
-│   └── EnergySystemEndpoints.java
-├── models/                             # DTO для запросов/ответов
-│   ├── Satellite.java
-│   ├── Constellation.java
-│   └── EnergySystem.java
-├── tests/                              # Тестовые классы
-│   ├── SatelliteTests.java
-│   ├── ConstellationTests.java
-│   └── EnergySystemTests.java
-└── utils/AllureUtils.java              # Утилиты для вложений в отчёт
 
 Порт основного приложения задаётся в TestConfig.java:
 
