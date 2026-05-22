@@ -1,81 +1,61 @@
-# 🛰️ Система управления спутниковой группировкой
+# 🛰️ Satellite API Tests
 
-Проект демонстрирует микросервисную архитектуру с синхронным (REST) и асинхронным потоковым (gRPC) взаимодействием.
+Автотесты для API системы управления группировкой спутников (Space Operation Center).  
+Проект написан на **Java + Gradle**, использует **JUnit 5**, **RestAssured** и **Allure Report**.
 
-## 📦 Состав микросервисов
+## 📋 Требования
 
-| Сервис | Порт | Описание |
-|--------|------|-----------|
-| **space-operation-center** | 8080 (REST) | Основной сервер: управление спутниками, созвездиями, хранение данных в PostgreSQL. |
-| **mission-scheduler** | 8090 (REST) | Планировщик миссий (опционально, добавлен ранее). |
-| **telemetry-service** | 9091 (gRPC) | Эмулятор телеметрии: стримит каждые 2 секунды температуру трёх спутников. |
+- JDK 17 или новее
+- Основной проект `satellite-constellation-system` запущен локально на порту **8080**  
+  (если порт другой – измените в `TestConfig.java`)
+- Gradle (можно использовать обёртку `./gradlew`)
 
-## 🔄 Взаимодействие сервисов
+## 🚀 Запуск тестов
 
-- `space-operation-center` → `telemetry-service` по **gRPC Server Streaming** (подписывается на поток телеметрии).
-- Полученные температуры (внутри/снаружи) сохраняются в БД в таблицу `satellite`.
-- При желании `telemetry-service` может получать реальный список спутников через REST от `space-operation-center` (доп. задание).
+```bash
+./gradlew clean test
+```
+После выполнения тестов результаты появятся в build/allure-results/.
+Генерация Allure-отчёта
+Убедитесь, что установлен Allure CLI (https://docs.qameta.io/allure/#_installing_a_commandline).
+Затем выполните:
 
-## 🚀 Запуск (Docker Compose)
+```bash
+./gradlew allureServe
+```
+Или вручную:
 
-Убедитесь, что установлены **Docker** и **Docker Compose**.
+```bash
+allure serve build/allure-results
+```
+Отчёт откроется в браузере автоматически.
 
-1. **Клонируйте репозиторий**
-   ```bash
-   git clone https://github.com/your-org/satellite-constellation-system.git
-   cd satellite-constellation-system
-Скопируйте proto-файл в основной сервер (для генерации клиентских классов)
+Спутники и всё осталное првоеряются POST, GET (все/один), PUT, DELETE
 
-bash
-cp telemetry-service/src/main/proto/telemetry.proto space-operation-center/src/main/proto/
-Сгенерируйте gRPC-классы (если не делали в IDE)
+Каждый метод проверяется позитивным сценарием (минимальный набор полей, ожидаемый код ответа)
 
-bash
-cd telemetry-service && ./gradlew generateProto
-cd ../space-operation-center && ./gradlew generateProto
-cd ..
-Соберите и запустите все сервисы
+📁 Структура проекта
 
-bash
-docker-compose up --build
-Сервисы поднимутся в одной сети space-net:
+src/test/java/com/example/tests/
+├── config/TestConfig.java              # Базовая настройка RestAssured
+├── endpoints/                          # Классы для каждого ресурса
+│   ├── SatelliteEndpoints.java
+│   ├── ConstellationEndpoints.java
+│   └── EnergySystemEndpoints.java
+├── models/                             # DTO для запросов/ответов
+│   ├── Satellite.java
+│   ├── Constellation.java
+│   └── EnergySystem.java
+├── tests/                              # Тестовые классы
+│   ├── SatelliteTests.java
+│   ├── ConstellationTests.java
+│   └── EnergySystemTests.java
+└── utils/AllureUtils.java              # Утилиты для вложений в отчёт
 
-PostgreSQL на порту 5432
+Порт основного приложения задаётся в TestConfig.java:
 
-space-operation-center на http://localhost:8080
+java
+RestAssured.port = 8080;   // измените при необходимости
 
-telemetry-service на localhost:9091 (gRPC)
 
-Проверьте работу
 
-Откройте http://localhost:8080/swagger-ui.html (если настроен OpenAPI)
-
-Или через curl проверьте, что у спутников появились температуры:
-
-bash
-curl http://localhost:8080/api/satellites/1
-В ответе должны быть поля insideTemperature и outsideTemperature.
-
-🧪 Что происходит внутри?
-telemetry-service генерирует случайные температуры для спутников 1, 2, 3 раз в 2 секунды.
-
-space-operation-center при старте подключается к gRPC-потоку и слушает обновления.
-
-Каждое обновление сохраняется в БД через JPA.
-
-Стрим длится 2 минуты (60 итераций), затем сервер завершает поток.
-
-🛠️ Технологии
-Java 17
-
-Spring Boot 3.2
-
-gRPC + protobuf
-
-Spring Data JPA / Hibernate
-
-PostgreSQL
-
-Docker & Docker Compose
-
-Gradle (Kotlin DSL)
