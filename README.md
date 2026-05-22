@@ -62,8 +62,8 @@ RestAssured.port = 8080;   // измените при необходимости
 
 ## Ссылки на репозитории
 
-- Основной проект: `https://github.com/your-org/satellite-constellation-system`
-- Проект автотестов: `https://github.com/your-org/satellite-api-tests`
+- Основной проект: `https://github.com/unclearblast/satellite-constellation-system/tree/seminar11`
+- Проект автотестов: `https://github.com/unclearblast/satellite-constellation-system/tree/autotest`
 
 ## Технологии
 
@@ -77,8 +77,7 @@ RestAssured.port = 8080;   // измените при необходимости
 
 ### 1. Клонировать проект автотестов
 ```bash
-git clone https://github.com/your-org/satellite-api-tests.git
-cd satellite-api-tests
+git clone https://github.com/unclearblast/satellite-constellation-system/tree/autotest.git
 2. Убедиться, что основной сервис запущен
 space-operation-center должен быть доступен по адресу http://localhost:8080
 
