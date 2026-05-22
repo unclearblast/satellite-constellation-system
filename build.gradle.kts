@@ -30,10 +30,25 @@ subprojects {
         implementation("net.devh:grpc-client-spring-boot-starter:3.0.0.RELEASE")
         implementation("io.grpc:grpc-protobuf:1.62.2")
         implementation("io.grpc:grpc-stub:1.62.2")
+        testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+        testImplementation("io.rest-assured:rest-assured:5.3.1")
+        testImplementation("io.rest-assured:json-path:5.3.1")
+        testImplementation("io.qameta.allure:allure-rest-assured:2.24.0")
+        testImplementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
         compileOnly("org.apache.tomcat:annotations-api:6.0.53")
     }
 
     tasks.withType<Test> {
         useJUnitPlatform()
     }
+tasks.test {
+    useJUnitPlatform()
+    systemProperty("allure.results.directory", "build/allure-results")
+}
+
+allure {
+    version.set("2.24.0")
+    autoconfigure.set(true)
+    aspectjweaver.set(true)
+}
 }
