@@ -58,4 +58,36 @@ java
 RestAssured.port = 8080;   // измените при необходимости
 
 
+# Проект автоматизированного тестирования Satellite API
 
+## Ссылки на репозитории
+
+- Основной проект: `https://github.com/your-org/satellite-constellation-system`
+- Проект автотестов: `https://github.com/your-org/satellite-api-tests`
+
+## Технологии
+
+- Java 17
+- Gradle (Kotlin DSL)
+- JUnit 5
+- RestAssured
+- Allure Framework
+
+## Запуск тестов и генерация отчета Allure
+
+### 1. Клонировать проект автотестов
+```bash
+git clone https://github.com/your-org/satellite-api-tests.git
+cd satellite-api-tests
+2. Убедиться, что основной сервис запущен
+space-operation-center должен быть доступен по адресу http://localhost:8080
+
+3. Выполнить тесты
+bash
+./gradlew clean test
+4. Сгенерировать Allure отчет
+bash
+./gradlew allureReport
+5. Открыть отчет в браузере
+bash
+./gradlew allureServe
