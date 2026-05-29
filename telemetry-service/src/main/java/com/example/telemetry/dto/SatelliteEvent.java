@@ -7,6 +7,8 @@ public class SatelliteEvent {
     private String eventId;
     private EventType eventType;
     private String satelliteId;
+    private String aggregateId;
+    private Object payload;
     private String satelliteName;
     private Instant timestamp;
 
