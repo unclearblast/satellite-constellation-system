@@ -1,0 +1,30 @@
+# space-operation-center/src/main/resources/application.yml
+spring:
+  application:
+    name: space-operation-center
+  datasource:
+    url: jdbc:postgresql://localhost:5432/satellite_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none   # выключаем автоматическую генерацию DDL
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: public
+  sql:
+    init:
+      mode: always          # выполнять schema.sql при запуске
+      schema-locations: classpath:schema.sql
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

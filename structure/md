@@ -1,0 +1,46 @@
+satellite-constellation-system/
+│
+├── build.gradle.kts
+├── settings.gradle.kts
+│
+└── src/
+    ├── main/
+    │   └── java/com/example/space/
+    │       ├── SatelliteConstellationSystemApplication.java
+    │       │
+    │       ├── domain/
+    │       │   ├── constellation/
+    │       │   │   └── SatelliteConstellation.java
+    │       │   │
+    │       │   └── satellite/
+    │       │       ├── Satellite.java
+    │       │       ├── SatelliteState.java
+    │       │       ├── EnergySystem.java
+    │       │       ├── CommunicationSatellite.java
+    │       │       └── ImagingSatellite.java
+    │       │
+    │       ├── exception/
+    │       │   └── SpaceOperationException.java
+    │       │
+    │       ├── factory/
+    │       │   ├── SatelliteFactory.java
+    │       │   ├── CommunicationSatelliteFactory.java
+    │       │   └── ImagingSatelliteFactory.java
+    │       │
+    │       ├── param/
+    │       │   ├── SatelliteType.java
+    │       │   ├── SatelliteParam.java
+    │       │   ├── ImagingSatelliteParam.java
+    │       │   └── CommunicationSatelliteParam.java
+    │       │
+    │       ├── repository/
+    │       │   └── ConstellationRepository.java
+    │       │
+    │       └── service/
+    │           ├── SatelliteService.java
+    │           ├── SatelliteServiceImpl.java
+    │           └── SpaceOperationCenterService.java
+    │
+    └── test/java/com/example/space/
+        ├── factory/SatelliteFactoryTest.java
+        └── service/SatelliteServiceTest.java
