@@ -1,6 +1,15 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/telemetry
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: telemetry-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -8,13 +17,8 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
         spring.json.type.mapping: satelliteEvent:com.example.telemetry.dto.SatelliteEvent
-    listener:
-      missing-topics-fatal: false
+      auto-offset-reset: earliest
+      enable-auto-commit: false   # ручное управление offset
 
-grpc:
-  server:
-    port: 9091
-
-logging:
-  level:
-    com.example.telemetry: INFO
+server:
+  port: 8081
