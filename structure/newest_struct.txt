@@ -1,0 +1,51 @@
+satellite-constellation-system/
+├── build.gradle.kts                              # Обновлён (зависимости)
+├── settings.gradle.kts                           # Без изменений
+├── space-operation-center/
+│   ├── build.gradle.kts                          # Обновлён (зависимости)
+│   └── src/
+│       ├── main/
+│       │   ├── java/com/example/spacecenter/
+│       │   │   ├── SpaceOperationCenterApplication.java
+│       │   │   ├── controller/
+│       │   │   │   ├── SpaceOperationController.java          # Обновлён
+│       │   │   │   ├── SatelliteController.java              # Новый
+│       │   │   │   ├── ConstellationController.java          # Новый
+│       │   │   │   └── EnergySystemController.java           # Новый
+│       │   │   ├── service/
+│       │   │   │   └── SpaceOperationCenterService.java      # Обновлён
+│       │   │   ├── facade/
+│       │   │   │   └── SpaceOperationFacade.java             # Обновлён
+│       │   │   ├── domain/
+│       │   │   │   ├── satellite/
+│       │   │   │   │   ├── Satellite.java                    # Обновлён (JPA)
+│       │   │   │   │   ├── CommunicationSatellite.java       # Обновлён (JPA)
+│       │   │   │   │   ├── ImagingSatellite.java             # Обновлён (JPA)
+│       │   │   │   │   └── SatelliteState.java               # Enum (JPA)
+│       │   │   │   ├── constellation/
+│       │   │   │   │   └── SatelliteConstellation.java       # Обновлён (JPA)
+│       │   │   │   ├── mission/                              # Без изменений
+│       │   │   │   │   └── MissionType.java
+│       │   │   │   └── energy/
+│       │   │   │       └── EnergySystem.java                 # Новый (JPA)
+│       │   │   ├── dto/                                      # Без изменений
+│       │   │   ├── config/
+│       │   │   │   └── OpenApiConfig.java
+│       │   │   ├── exception/
+│       │   │   │   └── GlobalExceptionHandler.java
+│       │   │   └── repository/                               # Новый пакет
+│       │   │       ├── SatelliteRepository.java
+│       │   │       ├── ConstellationRepository.java
+│       │   │       └── EnergySystemRepository.java
+│       │   └── resources/
+│       │       ├── application.yml                           # Обновлён
+│       │       └── schema.sql                                # Новый (DDL скрипт)
+│       └── test/
+│           └── java/com/example/spacecenter/
+│               ├── SpaceOperationCenterApplicationTests.java  # Обновлён (тесты)
+│               └── repository/
+│                   ├── SatelliteRepositoryTest.java          # Новый
+│                   └── ConstellationRepositoryTest.java      # Новый
+│
+├── mission-scheduler/                           # Без изменений
+└── README.md

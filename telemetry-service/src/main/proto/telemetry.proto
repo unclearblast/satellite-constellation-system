@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package com.example.telemetry;
+
+option java_package = "com.example.telemetry.proto";
+option java_multiple_files = true;
+
+service TelemetryService {
+    rpc StreamTelemetry(TelemetryRequest) returns (stream TelemetryUpdate);
+}
+
+message TelemetryRequest {
+    // Пока пустой, расширяется при необходимости
+    // Можно добавить фильтр по спутникам
+}
+
+message TelemetryUpdate {
+    int64 satellite_id = 1;
+    double inside_temperature = 2;
+    double outside_temperature = 3;
+    int64 timestamp = 4;
+}
