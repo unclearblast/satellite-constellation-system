@@ -20,6 +20,34 @@ spring:
     init:
       mode: always          # выполнять schema.sql при запуске
       schema-locations: classpath:schema.sql
+  cache:
+    type: redis
+    cache-names:
+      - satellite
+      - constellation
+      - satellites
+    redis:
+      time-to-live: 600000   # дефолтный TTL (если не переопределён в коде)
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,caches
+  endpoint:
+    metrics:
+      enabled: true
+    caches:
+      enabled: true
 
 server:
   port: 8080
