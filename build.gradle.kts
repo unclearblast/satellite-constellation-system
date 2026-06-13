@@ -31,6 +31,15 @@ subprojects {
         implementation("io.grpc:grpc-protobuf:1.62.2")
         implementation("io.grpc:grpc-stub:1.62.2")
         compileOnly("org.apache.tomcat:annotations-api:6.0.53")
+        implementation("org.springframework.boot:spring-boot-starter-web")
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+        implementation("org.springframework.boot:spring-boot-starter-cache")
+        implementation("org.springframework.boot:spring-boot-starter-data-redis")
+        implementation("org.springframework.boot:spring-boot-starter-actuator")    
+        runtimeOnly("org.postgresql:postgresql")
+        compileOnly("org.projectlombok:lombok")
+        annotationProcessor("org.projectlombok:lombok")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
 
     tasks.withType<Test> {
